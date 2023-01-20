@@ -30,7 +30,7 @@ class User (AbstractUser):
         default='user_last_name_default'
     )
     email = models.EmailField(
-        'email address',
+        verbose_name='email_address',
         blank=False,
         unique=True,
         max_length=254,

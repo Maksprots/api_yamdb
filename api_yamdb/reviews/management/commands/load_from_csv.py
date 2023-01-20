@@ -5,6 +5,9 @@ from django.core.management import BaseCommand
 from reviews.models import User, GenreTitle, Categories, Genre, Title, Review
 from reviews.models import Comments
 
+from .paths import USERS_PATH, CATEGORY_PATH, GENRE_PATH, TITLES_PATH
+from .paths import GENRE_TITLE_PATH, REVIEW_PATH, COMMENTS_PATH
+
 CSV_PATH = 'static/data/'
 
 
@@ -15,7 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        with open('static/data/users.csv', 'r', encoding='utf-8') as csvfile:
+        with open(USERS_PATH, 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
                 User.objects.get_or_create(
@@ -28,7 +31,7 @@ class Command(BaseCommand):
                     last_name=row['last_name']
                 )
 
-        with open('static/data/category.csv', 'r',
+        with open(CATEGORY_PATH, 'r',
                   encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
@@ -37,7 +40,7 @@ class Command(BaseCommand):
                     slug=row['slug']
                 )
 
-        with open('static/data/genre.csv', 'r', encoding='utf-8') as csvfile:
+        with open(GENRE_PATH, 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
                 Genre.objects.get_or_create(
@@ -45,7 +48,7 @@ class Command(BaseCommand):
                     slug=row['slug']
                 )
 
-        with open('static/data/titles.csv', 'r', encoding='utf-8') as csvfile:
+        with open(TITLES_PATH, 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
                 Title.objects.get_or_create(
@@ -54,25 +57,25 @@ class Command(BaseCommand):
                     category_id=row['category']
                 )
 
-        with open('static/data/genre_title.csv') as csvfile:
+        with open(GENRE_TITLE_PATH) as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
                 GenreTitle.title = GenreTitle.objects.get(id=row['title_id'])
                 GenreTitle.genre = GenreTitle.objects.get(id=row['genre_id'])
 
-        with open('static/data/review.csv', 'r', encoding='utf-8') as csvfile:
+        with open(REVIEW_PATH, 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
                 Review.objects.get_or_create(
                     id=row['id'],
-                    title_id=row['title_id'],
+                    title=row['title_id'],
                     text=row['text'],
                     author_id=row['author'],
                     score=row['score'],
                     pub_date=row['pub_date']
                 )
 
-        with open('static/data/comments.csv', 'r',
+        with open(COMMENTS_PATH, 'r',
                   encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
