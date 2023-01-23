@@ -62,7 +62,7 @@ class User (AbstractUser):
         )
 
 
-class Categories(models.Model):
+class Category(models.Model):
     """Модель категорий"""
 
     name = models.TextField(
@@ -112,7 +112,7 @@ class Title(models.Model):
         'description',
     )
     category = models.ForeignKey(
-        Categories,
+        Category,
         on_delete=models.PROTECT,
         related_name='category',
     )
