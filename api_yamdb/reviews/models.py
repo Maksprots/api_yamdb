@@ -1,8 +1,11 @@
+from api.utils import username_validation
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 # Эти валидаторы нужны для ограничения оценки типа: от 1 до 10
 # Чтобы не было оценок 99 из 10 :)
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+
+from .utils import year_validate
 
 # Список для выбора роли
 USER_ROLE_CHOICES = [
@@ -13,13 +16,14 @@ USER_ROLE_CHOICES = [
 """Выбор ролей"""
 
 
-class User (AbstractUser):
+class User(AbstractUser):
     """Кастомная модель User"""
 
     username = models.CharField(
         max_length=32,
         default='username_default',
-        unique=True
+        unique=True,
+        validators=(username_validation,),
     )
     first_name = models.CharField(
         max_length=32,
@@ -41,12 +45,19 @@ class User (AbstractUser):
         choices=USER_ROLE_CHOICES,
         default='user',
     )
+    confirmation_code = models.CharField(
+        'код подтверждения',
+        max_length=255,
+        null=True,
+        blank=False,
+
+    )
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
-    @property                       # нужно для удобного доступа
-    def is_user(self):              # чтобы не вызывать постоянно функцию
+    @property  # нужно для удобного доступа
+    def is_user(self):  # чтобы не вызывать постоянно функцию
         return self.role == 'user'  # советую почитать про этот декоратор!
 
     @property
@@ -55,11 +66,10 @@ class User (AbstractUser):
 
     @property
     def is_admin(self):
-        return (
-            self.role == 'admin'
-            or self.is_superuser
-            or self.is_staff
-        )
+        return (self.role == 'admin'
+                or self.is_superuser
+                or self.is_staff
+                )
 
 
 class Category(models.Model):
@@ -107,7 +117,7 @@ class Title(models.Model):
         blank=False,
         max_length=150,
     )
-    year = models.IntegerField()
+    year = models.IntegerField(validators=(year_validate,))
     description = models.TextField(
         'description',
     )
@@ -118,7 +128,8 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        through='GenreTitle'
+        through='GenreTitle',
+        through_fields=('title', 'genre')
     )
 
     class Meta:
@@ -158,6 +169,7 @@ class Review(models.Model):
     )
     score = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(10)],
+        default=1,
         verbose_name='rating')
     pub_date = models.DateTimeField(
         'pub_date',
@@ -166,11 +178,7 @@ class Review(models.Model):
 
     class Meta:
         ordering = ['-pub_date']
-        constraints = [
-            models.UniqueConstraint(
-                fields=["title", "author"], name="one_review_one_author"
-            ),
-        ]
+        unique_together = ('title', 'author',)
 
     def __str__(self):
         return self.text
@@ -180,7 +188,7 @@ class Comments(models.Model):
     """Модель комментариев к отзывам"""
 
     id = models.AutoField(primary_key=True)
-    review_id = models.ForeignKey(
+    review = models.ForeignKey(
         Review,
         verbose_name='Pu',
         related_name='comments',
