@@ -6,6 +6,10 @@ from django.core.mail import send_mail
 from rest_framework.serializers import ValidationError
 
 
+# from django.shortcuts import get_object_or_404
+# from ..reviews.models import User
+#
+
 def get_confirmation_code():
     """Генерирует 6-тизначный код."""
     return randint(
@@ -47,4 +51,5 @@ def username_validation(value):
         raise ValidationError(f'Нельзя использовать символ {forbidden_simbol} '
                               'в username. Имя пользователя может содержать '
                               'только буквы, цифры и символы @ . + - _.')
+
     return value

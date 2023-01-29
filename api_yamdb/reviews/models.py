@@ -22,7 +22,6 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=32,
         default='username_default',
-        unique=True,
         validators=(username_validation,),
     )
     first_name = models.CharField(
@@ -52,6 +51,9 @@ class User(AbstractUser):
         blank=False,
 
     )
+
+    class Meta:
+        unique_together = ('username',)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
