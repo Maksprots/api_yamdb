@@ -1,13 +1,9 @@
 from api.utils import username_validation
-from django.contrib.auth.models import AbstractUser
-# Эти валидаторы    нужны для ограничения оценки типа: от 1 до 10
-# Чтобы не было оценок 99 из 10 :)
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
+
 from .utils import year_validate
-
-
 
 
 class Category(models.Model):
@@ -54,20 +50,27 @@ class Title(models.Model):
     name = models.CharField(
         blank=False,
         max_length=150,
+        verbose_name='Название'
     )
-    year = models.IntegerField(validators=(year_validate,))
+    year = models.IntegerField(
+        verbose_name='Год выпуска',
+        validators=(year_validate,)
+    )
     description = models.TextField(
-        'description',
+        verbose_name='Описание',
+        blank=True
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
-        related_name='category',
+        related_name='title_categories',
+        verbose_name='Категория'
     )
     genre = models.ManyToManyField(
         Genre,
         through='GenreTitle',
-        through_fields=('title', 'genre')
+        through_fields=('title', 'genre'),
+        verbose_name='Жанр'
     )
 
     class Meta:
@@ -82,11 +85,13 @@ class GenreTitle(models.Model):
 
     title = models.ForeignKey(
         Title,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Произведение'
     )
     genre = models.ForeignKey(
         Genre,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Жанр'
     )
 
 
@@ -96,22 +101,24 @@ class Review(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.ForeignKey(
         Title,
-        verbose_name='titles',
+        verbose_name='Произведение',
         on_delete=models.PROTECT,
-        related_name='reviews'
+        related_name='reviews',
     )
-    text = models.TextField()
+    text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name='author_reviews',
+        verbose_name='Автор'
     )
     score = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(10)],
         default=1,
-        verbose_name='rating')
+        verbose_name='Оценка'
+    )
     pub_date = models.DateTimeField(
-        'pub_date',
         auto_now_add=True,
+        verbose_name='Дата публикации'
     )
 
     class Meta:
@@ -128,18 +135,19 @@ class Comments(models.Model):
     id = models.AutoField(primary_key=True)
     review = models.ForeignKey(
         Review,
-        verbose_name='Pu',
+        verbose_name='Комментарий',
         related_name='comments',
         on_delete=models.CASCADE,
     )
-    text = models.TextField()
+    text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='author',
+        related_name='comment_author',
+        verbose_name='Автор'
     )
     pub_date = models.DateTimeField(
-        'pub_date',
         auto_now_add=True,
+        verbose_name='Дата публикации'
     )
 
     class Meta:

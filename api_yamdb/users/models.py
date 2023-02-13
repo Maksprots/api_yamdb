@@ -3,11 +3,11 @@ from django.contrib.auth.models import AbstractUser
 
 from django.db import models
 
-USER_ROLE_CHOICES = [
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin'),
-]
+class Role(models.TextChoices):
+    ADMIN = 'admin'
+    MODERATOR = 'moderator'
+    USER = 'user'
+
 """Выбор ролей"""
 
 
@@ -16,7 +16,6 @@ class User(AbstractUser):
 
     username = models.CharField(
         max_length=32,
-        default='username_default',
         unique=True,
         validators=(username_validation,),
     )
@@ -37,7 +36,7 @@ class User(AbstractUser):
     bio = models.TextField('bio', blank=True)
     role = models.CharField(
         max_length=16,
-        choices=USER_ROLE_CHOICES,
+        choices=Role,
         default='user',
     )
     confirmation_code = models.CharField(
@@ -54,17 +53,17 @@ class User(AbstractUser):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
-    @property  # нужно для удобного доступа
-    def is_user(self):  # чтобы не вызывать постоянно функцию
-        return self.role == 'user'  # советую почитать про этот декоратор!
+    @property
+    def is_user(self):
+        return self.role == Role.USER
 
     @property
     def is_moderator(self):
-        return self.role == 'moderator'
+        return self.role == Role.MODERATOR
 
     @property
     def is_admin(self):
-        return (self.role == 'admin'
+        return (self.role == Role.ADMIN
                 or self.is_superuser
                 or self.is_staff
                 )
