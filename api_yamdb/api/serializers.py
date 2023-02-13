@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from reviews.models import Title, Category, Genre, User, Review, Comments
-
+from reviews.models import Title, Category, Genre, Review, Comments
+from users.models import User
 from api_yamdb import settings
 from .utils import username_validation
 

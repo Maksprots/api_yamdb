@@ -14,7 +14,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Title, Category, Genre, User, Review
+from reviews.models import Title, Category, Genre, Review
+from users.models import User
 
 from .filter import TitleFilter
 from .permissions import (AdminOnly, IsAdminUserOrReadOnly,
