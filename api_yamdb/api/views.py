@@ -26,7 +26,8 @@ from .serializers import (TitleSerializer, CategorySerializer,
                           CommentSerializer, TitleReadSerializer,
                           SignupSerializer
                           )
-from .utils import get_confirmation_code, send_confirmation_code
+from .utils import send_confirmation_code
+from django.contrib.auth.tokens import default_token_generator
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -146,7 +147,7 @@ class SignupView(views.APIView):
                  f'в базе с username={username}, email={email}')
             ) from error
 
-        user.confirmation_code = str(get_confirmation_code())
+        user.confirmation_code = default_token_generator.make_token(user)
         user.save()
         send_confirmation_code(user)
         return Response(serializer.validated_data, status=HTTP_200_OK)

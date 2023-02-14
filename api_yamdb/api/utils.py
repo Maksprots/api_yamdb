@@ -1,21 +1,7 @@
 import re
-from random import randint
-
 from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework.serializers import ValidationError
-
-
-# from django.shortcuts import get_object_or_404
-# from ..reviews.models import User
-#
-
-def get_confirmation_code():
-    """Генерирует 6-тизначный код."""
-    return randint(
-        settings.CONFIRMATION_CODE_MIN_VALUE,
-        settings.CONFIRMATION_CODE_MAX_VALUE
-    )
 
 
 def send_confirmation_code(user):
@@ -42,7 +28,7 @@ def username_validation(value):
     Нельзя использовать имя пользователя me.
     Допускается использовать только буквы, цифры и символы @ . + - _.
     """
-    if value == 'me':
+    if value.lower() in settings.PROHIBITED_USERNAMES:
         raise ValidationError('Нельзя использовать "me" как имя пользователя')
     checked_value = re.match('^[\\w.@+-]+', value)
     if checked_value is None or checked_value.group() != value:
@@ -51,5 +37,4 @@ def username_validation(value):
         raise ValidationError(f'Нельзя использовать символ {forbidden_simbol} '
                               'в username. Имя пользователя может содержать '
                               'только буквы, цифры и символы @ . + - _.')
-
     return value

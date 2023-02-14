@@ -3,12 +3,12 @@ from django.contrib.auth.models import AbstractUser
 
 from django.db import models
 
+
 class Role(models.TextChoices):
+    """Выбор ролей"""
     ADMIN = 'admin'
     MODERATOR = 'moderator'
     USER = 'user'
-
-"""Выбор ролей"""
 
 
 class User(AbstractUser):
@@ -67,6 +67,3 @@ class User(AbstractUser):
                 or self.is_superuser
                 or self.is_staff
                 )
-
-
-
