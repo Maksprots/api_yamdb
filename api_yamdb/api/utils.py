@@ -30,7 +30,7 @@ def username_validation(value):
     Допускается использовать только буквы, цифры и символы @ . + - _.
     """
     if value.lower() in settings.PROHIBITED_USERNAMES:
-        raise ValidationError('Нельзя использовать "me" как имя пользователя')
+        raise ValidationError('Недопустимое имя пользователя')
     checked_value = re.match('^[\\w.@+-]+', value)
     if checked_value is None or checked_value.group() != value:
         forbidden_simbol = value[0] if (checked_value is None) \

@@ -154,4 +154,3 @@ class JWTTokenSerializer(serializers.Serializer):
             username_validation
         ]
     )
-
