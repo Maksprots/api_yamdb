@@ -154,7 +154,4 @@ class JWTTokenSerializer(serializers.Serializer):
             username_validation
         ]
     )
-    confirmation_code = serializers.CharField(
-        max_length=settings.CONFIRMATION_CODE_MAX_LENGTH,
-        required=True
-    )
+

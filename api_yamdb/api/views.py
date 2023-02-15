@@ -14,9 +14,10 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.tokens import default_token_generator
+
 from reviews.models import Title, Category, Genre, Review
 from users.models import User
-
 from .filter import TitleFilter
 from .permissions import (AdminOnly, IsAdminUserOrReadOnly,
                           AdminModeratorAuthorPermission)
@@ -27,7 +28,6 @@ from .serializers import (TitleSerializer, CategorySerializer,
                           SignupSerializer
                           )
 from .utils import send_confirmation_code
-from django.contrib.auth.tokens import default_token_generator
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -147,7 +147,6 @@ class SignupView(views.APIView):
                  f'в базе с username={username}, email={email}')
             ) from error
 
-        user.confirmation_code = default_token_generator.make_token(user)
         user.save()
         send_confirmation_code(user)
         return Response(serializer.validated_data, status=HTTP_200_OK)
@@ -160,9 +159,10 @@ class TokenView(views.APIView):
         serializer = JWTTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
-        confirmation_code = serializer.validated_data['confirmation_code']
+        confirmation_code = request.data['confirmation_code']
+
         user = get_object_or_404(User, username=username)
-        if user.confirmation_code != confirmation_code:
+        if not default_token_generator.check_token(user, confirmation_code):
             return Response(
                 {
                     "confirmation_code": ("Неверный код доступа "

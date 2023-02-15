@@ -62,7 +62,7 @@ class Title(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
-        related_name='title_categories',
+        related_name='title',
         verbose_name='Категория'
     )
     genre = models.ManyToManyField(
@@ -141,7 +141,7 @@ class Comments(models.Model):
     text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='comment_author',
+        related_name='comment',
         verbose_name='Автор'
     )
     pub_date = models.DateTimeField(

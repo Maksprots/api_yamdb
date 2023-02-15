@@ -2,6 +2,7 @@ import re
 from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework.serializers import ValidationError
+from django.contrib.auth.tokens import default_token_generator
 
 
 def send_confirmation_code(user):
@@ -15,7 +16,7 @@ def send_confirmation_code(user):
         message=(
             'Для завершения регистрации на Yamdb отправьте запрос '
             f'с именем пользователя {user.username} и '
-            f'кодом подтверждения {user.confirmation_code} '
+            f'кодом подтверждения {default_token_generator.make_token(user)} '
             'на эндпойнт /api/v1/auth/token/.'
         ),
         from_email=settings.DEFAULT_FROM_EMAIL,
